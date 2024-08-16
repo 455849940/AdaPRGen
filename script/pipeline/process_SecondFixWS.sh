@@ -1,6 +1,5 @@
 #!/bin/bash
-# 混合数据训练第二阶段【None,微调，二阶段最好模型】
-# 从命令行参数获取循环次数
+
 begin_iterations=2000
 end_iterations=30000
 PORT=63600
@@ -31,18 +30,18 @@ Exec_status=true
 statistic_status=true
 test_status=true
 
-# 获取 GPU 个数
+
 IFS=',' read -ra GPU_ARRAY <<< "$gpu_seq"
 gpu_count=${#GPU_ARRAY[@]}
 
 if [ "$train_status" = "true" ]; then
-    # 构建文件路径
+
     file_path="./output_dir/loraWeight/$SAVE_FILE"
-    # 检查文件是否存在
+
     if [ -e "$file_path" ]; then
-        echo "文件 $file_path 存在"
+        echo "file $file_path exist"
     else
-        echo "目录 $file_path 不存在，创建目录"
+        echo "catalogue $file_path not exist, create it"
         mkdir -p "$file_path"
     fi
 
@@ -79,13 +78,13 @@ fi
 
 if [ "$dev_status" = "true" ]; then
 
-    # 构建文件路径
+
     file_path="./predict_dir/loraWeight/$SAVE_FILE"
-    # 检查文件是否存在
+
     if [ -e "$file_path" ]; then
-        echo "文件 $file_path 存在"
+        echo "file $file_path exist"
     else
-        echo "目录 $file_path 不存在，创建目录"
+        echo "catalogue $file_path not exist, create it"
         mkdir -p "$file_path"
     fi
 
@@ -96,13 +95,11 @@ fi
 
 
 if [ "$Exec_status" = "true" ]; then
-    # 构建文件路径
     file_path="./predict_evalResult_dir/$SAVE_FILE"
-    # 检查文件是否存在
     if [ -e "$file_path" ]; then
-        echo "文件 $file_path 存在"
+        echo "file $file_path exist"
     else
-        echo "目录 $file_path 不存在，创建目录"
+        echo "catalogue $file_path not exist, create it"
         mkdir -p "$file_path"
     fi
 
@@ -111,23 +108,18 @@ if [ "$Exec_status" = "true" ]; then
 fi
 
 if [ "$statistic_status" = "true" ]; then
-    # 初始化最大 rate 和对应的 i
     max_rate=0.0
     best_iteration=0
     echo ">>>start choose best dev rate value"
-    # 遍历迭代范围，执行脚本并捕获输出
     for ((i=begin_iterations; i<=end_iterations; i+=SAVE_STEPS)); do
         output=$(bash ./script/pipeline/part/Statistical_Execution_Results.sh "$SAVE_FILE" "$PATTERN" "$i")
         echo "$output"
-        #从输出中提取 rate 值
         avg_improve_rate=$(echo "$output" | grep 'avg_improve_rate = ' | awk '{print $3}')
-        # 检查 rate 是否提取成功
         if [ -z "$avg_improve_rate" ]; then
             echo "Failed to extract rate for iteration $i"
             continue
         fi
-        #echo eavg_improve_rate
-        # 比较并更新最大 rate 和对应的 i
+
         if (( $(echo "$avg_improve_rate > $max_rate" | bc -l) )); then
         max_rate=$avg_improve_rate
         best_iteration=$i

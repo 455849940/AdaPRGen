@@ -17,13 +17,10 @@ B_SYS, E_SYS = "<<SYS>>\n", "\n<</SYS>>\n\n"
 
 
 def create_token_labels(token_ids, tokenizer, seq_length, special_tokens=['-', '+']):
-    # 使用分词器对文本进行分词
     #token_ids = tokenizer.convert_tokens_to_ids(tokens)
     
-    # 初始化一个与Token数目相同的mask列表
     mask = [-100] * seq_length
     #print(f"seq_length = {seq_length}")
-    # 遍历每个Token，检查它是否对应于特定字符
     LineBreakTokenID = tokenizer.convert_tokens_to_ids(tokenizer.tokenize('\n'))[-1]
     special_tokenIDs = tokenizer.convert_tokens_to_ids(special_tokens)
     before_Token_id = 0
@@ -43,13 +40,10 @@ def create_token_labels(token_ids, tokenizer, seq_length, special_tokens=['-', '
     return  mask
     
 def create_token_mask(token_ids, tokenizer, seq_length, special_tokens=['-', '+']):
-    # 使用分词器对文本进行分词
     #token_ids = tokenizer.convert_tokens_to_ids(tokens)
     
-    # 初始化一个与Token数目相同的mask列表
     mask = [0] * seq_length
     #print(f"seq_length = {seq_length}")
-    # 遍历每个Token，检查它是否对应于特定字符
     LineBreakTokenID = tokenizer.convert_tokens_to_ids(tokenizer.tokenize('\n'))[-1]
     special_tokenIDs = tokenizer.convert_tokens_to_ids(special_tokens)
     before_Token_id = 0
@@ -76,7 +70,7 @@ class TextDataset(Dataset):
         def __getitem__(self, index):
             
             item = self.data[index]
-            #print("Dataset item:", item)  # 打印获取的数据项
+            #print("Dataset item:", item)
             return item
             #return 
 
@@ -84,7 +78,7 @@ class TextDataset(Dataset):
             return len(self.data)
         
         def collate_batch(self, batch):
-            #print("@@@@ Batch before collate:", batch)  # 打印原始批次数据
+            #print("@@@@ Batch before collate:", batch)
 
             input_ids_batch = []
             attention_mask_batch = []
@@ -335,7 +329,7 @@ class processClass:
                 new_items['code2'] = items[i]['diff_content']
                 new_items['input'] = self.get_instruction(problem_content[i], new_items['code1'], new_items['code2'], language, is_test,prompt_pattern) 
                 text = tokenizer(new_items['input'],return_tensors='pt')
-                if is_test is False and text['input_ids'].shape[1] > 2048: continue #训练数据过长不要了 
+                if is_test is False and text['input_ids'].shape[1] > 2048: continue
             elif prompt_pattern == "fixbycrp" or prompt_pattern == "fixbycrflp":
                 new_items['code2'] = items[i]['code2']
 
@@ -385,7 +379,7 @@ class processClass:
                     #normal
                     if is_test == True and text['input_ids'].shape[1] > 2048:
                         continue
-                    if is_test == False and text['input_ids'].shape[1] > 2048: #不要了
+                    if is_test == False and text['input_ids'].shape[1] > 2048:
                         continue
                         
        
@@ -400,7 +394,6 @@ class processClass:
             data_list = json.load(f)
         return data_list
 
-    #获取部分还是全部数据
     def get_data_iter(self,data_list, debug=False, is_test=False):
         if debug:
             data_size = len(data_list)
@@ -415,7 +408,6 @@ class processClass:
         #else:
         return data_list
         
-    #可能根据test和train的不同修改成对应的数据内容 字段名可以一致但内容不同
     def load_dataset(self,language, problem_path, data_path, CRPdata_path = None, tokenizer=None, debug=False, padding=False, batch_size = 1,is_test=False, \
         prompt_pattern="normal",rank = 0, pattern = None, use_predict_crp = False):
         if rank == 0:
@@ -430,7 +422,7 @@ class processClass:
                 crpdata_list =  self.load_json_data(CRPdata_path)
                 crp_map = dict()
                 for item in crpdata_list:
-                    crp_map[item['submission1_id']] = item['crp_content'] #是 crp_content 
+                    crp_map[item['submission1_id']] = item['crp_content']
                 for item in data_list:
                     item['crp_content'] = crp_map[item['submission1_id']]
 

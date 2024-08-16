@@ -208,7 +208,6 @@ def get_stack_exchange_paired2(
     """
     df = pd.DataFrame(data_list)
 
-    # 将 DataFrame 转换为 Dataset
     dataset = Dataset.from_pandas(df)
     original_columns = dataset.column_names
 
@@ -301,7 +300,7 @@ if __name__ == "__main__":
         print(f"Rejected sample {index} of the raw training set:\n\n{train_data_set[index]['rejected']}")
     
     # 4. initialize training arguments:
-    training_args = DPOConfig( #c重写DPOPConfig加入dpop_lambda
+    training_args = DPOConfig(
         #dpop_lambda = script_args.dpop_lambda,
         truncation_mode = "keep_start",
         per_device_train_batch_size=script_args.per_device_train_batch_size,

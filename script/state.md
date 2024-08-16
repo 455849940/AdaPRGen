@@ -1,8 +1,8 @@
 #### eval_single.sh/eval_multi.sh
-用模型对dev/test集进行代码修复的代码生成
+Code generation for code fixes to dev/test sets using models
 
 #### Exectuion_Eval.sh
-对生成代码进行执行得到结果
+Execute the generated code and get the result
 
 #### recyle_eval.sh
-对多个权重文件进行循环测评eval_Multi
+Perform a cyclic eval_Multi evaluation on multiple weight files

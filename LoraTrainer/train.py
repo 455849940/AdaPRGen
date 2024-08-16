@@ -72,31 +72,7 @@ def main(**kwargs):
                 "pad_token": "<PAD>",
             }
         ) 
-    #print(f"tokenizer.pad_token ={tokenizer.pad_token }")
-    #print(f"tokenizer.eos_token ={tokenizer.eos_token }")
-    #input()
-    # if args.prompt_pattern == "diff":
-    #     # 自定义新词汇
-    #     new_tokens = ["<+>", "<->"]
-    #     # 添加新词汇到tokenizer
-    #     tokenizer.add_tokens(new_tokens)  
-       
-    #打印结果
-    # if rank == 0:
-    #     print(tokenizer.special_tokens_map)
-    #     print(tokenizer.convert_ids_to_tokens(tokenizer.encode("<BOS> hello <PAD> <+> <-> <EOS>")))    
-    #     # 查看新词汇和特殊标记的ID
-    #     bos_id = tokenizer.convert_tokens_to_ids('<BOS>')
-    #     eos_id = tokenizer.convert_tokens_to_ids('<EOS>')
-    #     pad_id = tokenizer.convert_tokens_to_ids('<PAD>')
-    #     new_tokens_ids = tokenizer.convert_tokens_to_ids(new_tokens)
-    #     # 打印结果
-    #     print(f"ID of '<BOS>': {bos_id}")
-    #     print(f"ID of '<EOS>': {eos_id}")
-    #     print(f"ID of '<PAD>': {pad_id}")
-    #     print(f"IDs of new tokens {new_tokens}: {new_tokens_ids}")
-  
-    #tokenizer.pad_token = tokenizer.eos_token
+    
     # load data
     #---------------------------------------------------------------------------------  
     proc = processClass()
@@ -117,10 +93,8 @@ def main(**kwargs):
         )
         peft_config = generate_peft_config(args, kwargs)
         model = get_peft_model(model, peft_config)
-        # 扩展模型的词嵌入层，使其与分词器的词汇表大小一致
         model.resize_token_embeddings(len(tokenizer))
 
-        # 打印模型的词嵌入层和分词器的词汇表大小以验证
         if rank == 0:
             print(f"Model embedding size: {model.get_input_embeddings().weight.size(0)}")
             print(f"Tokenizer vocabulary size: {len(tokenizer)}")
@@ -133,9 +107,7 @@ def main(**kwargs):
             )
             peft_config = generate_peft_config(args, kwargs)
             model = get_peft_model(model, peft_config)
-            # 扩展模型的词嵌入层，使其与分词器的词汇表大小一致
             model.resize_token_embeddings(len(tokenizer))
-            # 打印模型的词嵌入层和分词器的词汇表大小以验证
             print(f"Model embedding size: {model.get_input_embeddings().weight.size(0)}")
             print(f"Tokenizer vocabulary size: {len(tokenizer)}")
             model = LoraCodeLlama(model).cuda()
@@ -147,18 +119,6 @@ def main(**kwargs):
     #---------------------------------------------------------------------------------
 
     if args.do_train:
-        # model, _, _, _  = deepspeed.initialize(args=args, 
-        #                                                           model=model,
-		# 						model_parameters=model.parameters(), 
-        #                         config=args.speedjson)
-        # 创建一个 DataLoader，使用和 Trainer 相同的参数
-        # data_loader = DataLoader(train_data_set, batch_size=2, collate_fn=train_data_set.collate_batch)
-
-        # # 手动遍历 DataLoader 看看输出
-        # for batch in data_loader:
-        #     print("Batch from manual DataLoader:", batch)
-        #     break
-        # input()
         if args.use_peft == True:
             trainer = ModelTrainer(
                 model = model,
@@ -181,8 +141,7 @@ def main(**kwargs):
                 #save_safetensors=False,
                 #save_strategy = "steps"
             )  
-        # 从上次保存的检查点继续训练
-        
+     
 
         if args.resume == True:
             trainer.train(resume_from_checkpoint=True)    

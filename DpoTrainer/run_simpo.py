@@ -229,7 +229,6 @@ def main():
     # # model = get_peft_model(model, peft_config)
 
 
-    # # 打印模型的词嵌入层和分词器的词汇表大小以验证
     # if rank == 0:
     #     print(f"Model embedding size: {model.get_input_embeddings().weight.size(0)}")
     #     print(f"Tokenizer vocabulary size: {len(tokenizer)}")

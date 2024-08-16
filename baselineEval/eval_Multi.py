@@ -32,17 +32,17 @@ def load_peft_model(model, peft_model):
     return peft_model
 
 def extract_triple_quotes(text):
-    # 匹配被三引号 ''' 包裹的内容
+    # Matches the content wrapped in triple quotes '''.
     pattern = r"```(.*?)```"
     
-    # 使用 findall 寻找所有匹配的内容
+    # Use findall to find all matching content
     matches = re.findall(pattern, text, flags=re.DOTALL)
     
     if matches:
-        # 如果找到匹配的内容，则返回所有被三引号包裹的部分 0为index
+        # If matching content is found, return all parts wrapped in triple quotes ''' as a list where 0 is the index.
         return matches[0]
     else:
-        # 如果没有找到匹配的内容，返回原始文本
+        # If no matching content is found, return the original text.
         return text
     
 def Get_code_content(text):
@@ -65,10 +65,10 @@ def eval_for_baseline(rank, world_size, args, tokenizer, dataloader):
     model = LlamaForCausalLM.from_pretrained(args.output_dir)
 
     model.resize_token_embeddings(len(tokenizer))
-    # 打印模型的词嵌入层和分词器的词汇表大小以验证
+    # Print the size of the model's word embedding layer and tokenizer's vocabulary for verification
     print(f"Model embedding size: {model.get_input_embeddings().weight.size(0)}")
     print(f"Tokenizer vocabulary size: {len(tokenizer)}")
-    model = model.to(rank).half()  # 将模型转换为半精度
+    model = model.to(rank).half()  # Convert the model to half precision
     
     # Initialize DeepSpeed for inference
     # ds_engine = deepspeed.init_inference(
@@ -85,7 +85,7 @@ def eval_for_baseline(rank, world_size, args, tokenizer, dataloader):
     eval_list = []
     print(f'rank = {rank}')
  
-    # 生成文本
+    # Generate text
     for step, batch in enumerate(tqdm(dataloader,colour="green", desc="predict Epoch", dynamic_ncols=True)): 
         input_ids=batch['input_ids'].to(rank)
         user_id_batch=batch['user_id_batch']
@@ -99,7 +99,7 @@ def eval_for_baseline(rank, world_size, args, tokenizer, dataloader):
                 output_sequences = model.generate(input_ids=input_ids, max_new_tokens= (args.max_length/2), pad_token_id = tokenizer.pad_token_id, use_cache=True)
 
         for i in range(0, batch_size):
-            # 解码生成的文本
+            # Decode the generated text
             generated_text = tokenizer.decode(output_sequences[i], skip_special_tokens=True)
             #print(generated_text)
             #input()
@@ -108,14 +108,14 @@ def eval_for_baseline(rank, world_size, args, tokenizer, dataloader):
             submission1_id = submission1_id_batch[i]
             code_content = Get_code_content(generated_text)
             item = {"user_id":user_id, "problem_id":problem_id, "submission1_id":submission1_id, "code_content": code_content, "origin_generated_text": generated_text.split(E_INST)[1]}
-            #item = item.cpu().numpy().tolist()  # 转换为列表
+            #item = item.cpu().numpy().tolist()
             eval_list.append(item)
             #eval_list.append(item)
     
-    # 同步所有进程
+    # Synchronize all processes
     dist.barrier()
 
-    # 收集所有输出
+    # Collect all outputs
     all_outputs = gather_all_outputs(eval_list, world_size)
     if rank == 0:
         save_data_to_json(all_outputs, args.predict_filePath)
@@ -164,7 +164,7 @@ def main(**kwargs):
     eval_dataloader = DataLoader(eval_dataset_set , batch_size=args.per_device_eval_batch_size, collate_fn=eval_dataset_set.collate_batch, num_workers=4,sampler=val_sampler if val_sampler else None)
     print(f"args.per_device_eval_batch_size = {args.per_device_eval_batch_size}")
     
-    # 使用多进程进行评测
+    # Use multiprocessing for evaluation
 
     eval_for_baseline(rank, world_size, args,tokenizer, eval_dataloader)
 

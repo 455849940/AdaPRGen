@@ -17,13 +17,9 @@ B_SYS, E_SYS = "<<SYS>>\n", "\n<</SYS>>\n\n"
 
 
 def create_token_labels(token_ids, tokenizer, seq_length, special_tokens=['-', '+']):
-    # 使用分词器对文本进行分词
-    #token_ids = tokenizer.convert_tokens_to_ids(tokens)
-    
-    # 初始化一个与Token数目相同的mask列表
+
     mask = [-100] * seq_length
     #print(f"seq_length = {seq_length}")
-    # 遍历每个Token，检查它是否对应于特定字符
     LineBreakTokenID = tokenizer.convert_tokens_to_ids(tokenizer.tokenize('\n'))[-1]
     special_tokenIDs = tokenizer.convert_tokens_to_ids(special_tokens)
     before_Token_id = 0
@@ -43,13 +39,10 @@ def create_token_labels(token_ids, tokenizer, seq_length, special_tokens=['-', '
     return  mask
     
 def create_token_mask(token_ids, tokenizer, seq_length, special_tokens=['-', '+']):
-    # 使用分词器对文本进行分词
     #token_ids = tokenizer.convert_tokens_to_ids(tokens)
     
-    # 初始化一个与Token数目相同的mask列表
     mask = [0] * seq_length
     #print(f"seq_length = {seq_length}")
-    # 遍历每个Token，检查它是否对应于特定字符
     LineBreakTokenID = tokenizer.convert_tokens_to_ids(tokenizer.tokenize('\n'))[-1]
     special_tokenIDs = tokenizer.convert_tokens_to_ids(special_tokens)
     before_Token_id = 0
@@ -171,7 +164,6 @@ class processClass:
             data_list = json.load(f)
         return data_list
 
-    #获取部分还是全部数据
     def get_data_iter(self,data_list, debug=False, is_test=False):
         if debug:
             data_size = len(data_list)
@@ -186,7 +178,6 @@ class processClass:
         #else:
         return data_list
         
-    #可能根据test和train的不同修改成对应的数据内容 字段名可以一致但内容不同
     def load_dataset(self,language, problem_path, data_path, CRPdata_path = None, tokenizer=None, debug=False, padding=False, batch_size = 1,is_test=False, \
         prompt_pattern="normal",rank = 0, pattern = None, use_predict_crp = False):
         if rank == 0:

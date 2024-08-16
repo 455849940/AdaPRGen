@@ -4,10 +4,10 @@ from ExecutiveProgram.Worker import Checker, Worker, Program_Submission, Quesion
 from utlis.utils import load_list_from_json, save_list_to_json, save_data_to_json
 from tqdm import tqdm
 class RecordProcess:
-    def __init__(self, Available_Record_PId_path = "/home/develop/dzl/CodeFixProject/CodeFixDatasets/CodeFixPairData/PythonStatistics/Available_PId.json",\
-        Read_prefix_url = "/home/develop/dzl/CodeFixProject/CodeFixDatasets/CodeFixPairData/PythonData/",\
-        test_directory_prefix_url = '/home/develop/dzl/CodeFixProject/CodeDatasets/merged_test_cases/',\
-        Write_prefix_url = "/home/develop/dzl/CodeFixDatasets/CodeFixPairData/PythonResultData/",\
+    def __init__(self, Available_Record_PId_path = "/home/develop/xxx/CodeFixProject/CodeFixDatasets/CodeFixPairData/PythonStatistics/Available_PId.json",\
+        Read_prefix_url = "/home/develop/xxx/CodeFixProject/CodeFixDatasets/CodeFixPairData/PythonData/",\
+        test_directory_prefix_url = '/home/develop/xxx/CodeFixProject/CodeDatasets/merged_test_cases/',\
+        Write_prefix_url = "/home/develop/xxx/CodeFixDatasets/CodeFixPairData/PythonResultData/",\
         language = "Python"):
         self.Available_Record_PId_path = Available_Record_PId_path
         self.Read_prefix_url = Read_prefix_url
@@ -17,21 +17,18 @@ class RecordProcess:
         self.worker = Worker()
         self.checker = Checker()
         self.Available_PId_List = load_list_from_json(self.Available_Record_PId_path)
-        FileHandlerSingleton.initialize()     # 初始化文件共享对象
+        FileHandlerSingleton.initialize()
     def JudgeWrongResultStatus(self, Psubmit, item):
 
         if Psubmit.ResultStatus == item["status1"]:
             TotalScore = len(Psubmit.CheckRunResultList)
-            # 定义结果到分数的映射
             result_mapping = {
                 'Accepted': 1,
                 'Time Limit Exceeded': -1,
                 'Wrong Answer': 0
             }
             
-            # 使用映射进行转换
             CheckRunResultList = [result_mapping[result] for result in Psubmit.CheckRunResultList]
-            # 计算Score
             Score = CheckRunResultList.count(1)
             item["code1_test_status"] = CheckRunResultList
             item["code1_test_score"] = Score
@@ -48,12 +45,9 @@ class RecordProcess:
     
     def Process_For_Single_RecordJson(self, Pid):
 
-        #读入与写入json位置
         Read_prefix_path = self.Read_prefix_url + f"p{Pid}.json"
         Write_prefix_path = self.Write_prefix_url + f"p{Pid}.json"
-        #P{PId}.json对象读取
         ProcessDataList = load_list_from_json(Read_prefix_path)
-        #测试点文件读取
         test_directory_path = self.test_directory_prefix_url + f"p{Pid}"
         #instance_info = FileHandlerSingleton(test_directory_path)
         Test_List = Quesion_Test_Point_objectList()
@@ -67,13 +61,12 @@ class RecordProcess:
         AC2Wrong_data_count = 0
 
         for item in ProcessDataList:
-            #对于每条记录进行测评得到返回对象
-            #将返回对象选取元素放入结果  
+            #Evaluate each record to obtain the return object
+            #Select elements from the return object and place them into the results
             #"code1_test_status": [],
             #"code1_test_score": 0
             if item["status1"] == "Time Limit Exceeded": continue
             
-            #跑Code1填充结果
             submission1_id = item["submission1_id"]
             Compile_File_name = f"{submission1_id}.py"
             CodeContent =  item["code1"]
@@ -84,7 +77,6 @@ class RecordProcess:
             if flag == False:
                 Wrong2AC_data_count += 1
                 continue
-            #验证数据是正确的
             submission2_id = item["submission2_id"]
             Compile_File_name = f"{submission2_id}.py"
             CodeContent =  item["code2"]
@@ -99,7 +91,6 @@ class RecordProcess:
             # print(Psubmit)
             # print(item["problem_id"])
             # print(len(Psubmit.CheckRunResultList))
-            #放入数据
             
             ResultDataList.append(item)
 

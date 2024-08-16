@@ -18,8 +18,8 @@ def find_unique_user_ids(file1_path, file2_path):
     return unique_user_ids
 
 if __name__ == "__main__":
-    file1_path = '/data/develop/dzl/CodeRepairLLM-Speed/repairDataset/RepairData-PythonLevel/dev.json'
-    file2_path = '/data/develop/dzl/CodeRepairLLM-Speed/predict_evalResult_dir/6-14/Exec_dev-checkpoint-4000.json'
+    file1_path = '/data/develop/xxx/CodeRepairLLM-Speed/repairDataset/RepairData-PythonLevel/dev.json'
+    file2_path = '/data/develop/xxx/CodeRepairLLM-Speed/predict_evalResult_dir/6-14/Exec_dev-checkpoint-4000.json'
 
     unique_user_ids = find_unique_user_ids(file1_path, file2_path)
     print(f'User IDs not present in both files: {unique_user_ids}')

@@ -25,8 +25,6 @@ import re
 import inspect
 from transformers import GenerationConfig
 #import safetensors
-# 尝试增加头部大小限制
-#safetensors_rust.set_header_size_limit(1024 * 1024)  # 设置头部大小限制为 1MB
 
 B_INST, E_INST = "[INST]", "[/INST]"
 B_SYS, E_SYS = "<<SYS>>\n", "\n<</SYS>>\n\n"
@@ -36,17 +34,13 @@ def load_peft_model(model, peft_model):
     return peft_model
 
 def extract_triple_quotes(text):
-    # 匹配被三引号 ''' 包裹的内容
     pattern = r"```(.*?)```"
     
-    # 使用 findall 寻找所有匹配的内容
     matches = re.findall(pattern, text, flags=re.DOTALL)
     
     if matches:
-        # 如果找到匹配的内容，则返回所有被三引号包裹的部分 0为index
         return matches[0]
     else:
-        # 如果没有找到匹配的内容，返回原始文本
         return text
     
 def Get_code_content(text):
@@ -58,8 +52,6 @@ def eval_for_use_peft(args, model, tokenizer, dataloader):
     model.eval()
     eval_list = []
 
- 
-    # 生成文本
     for step, batch in enumerate(tqdm(dataloader,colour="green", desc="predict Epoch", dynamic_ncols=True)): 
         input_ids=batch['input_ids'].cuda()
         user_id_batch=batch['user_id_batch']
@@ -75,7 +67,6 @@ def eval_for_use_peft(args, model, tokenizer, dataloader):
             print(generated_text)
         input()
         for i in range(0, args.per_device_eval_batch_size):
-            # 解码生成的文本
             generated_text = tokenizer.decode(output_sequences[i], skip_special_tokens=True)
             user_id = user_id_batch[i]
             problem_id = problem_id_batch[i]
@@ -119,26 +110,18 @@ def main(**kwargs):
         tokenizer = LlamaTokenizer.from_pretrained(args.output_dir, padding_side='left')#, padding_side='left'
         model.resize_token_embeddings(len(tokenizer))
         model = model.cuda()
-        # 打印模型的词嵌入层和分词器的词汇表大小以验证
         print(f"Model embedding size: {model.get_input_embeddings().weight.size(0)}")
         print(f"Tokenizer vocabulary size: {len(tokenizer)}")
-        # 打印模型的默认生成配置
         default_generation_config = model.generation_config
 
-        print("模型的默认生成配置参数:")
         for param, value in vars(default_generation_config).items():
             print(f"{param}: {value}")
-
-        # 获取 generate 方法的签名
         generate_signature = inspect.signature(model.generate)
-
-        # 打印 generate 方法的参数（包括默认值的参数）
-        print("\nmodel.generate 方法的参数（包括默认值的参数）:")
         for param in generate_signature.parameters.values():
             if param.default != inspect.Parameter.empty:
                 print(f"{param.name}: {param.default}")
             else:
-                print(f"{param.name}: 无默认值")
+                print(f"{param.name}: No default value")
         
     else:
             
@@ -147,9 +130,9 @@ def main(**kwargs):
             )
             peft_config = generate_peft_config(args, kwargs)
             model = get_peft_model(model, peft_config)
-            # 扩展模型的词嵌入层，使其与分词器的词汇表大小一致
+
             model.resize_token_embeddings(len(tokenizer))
-            # 打印模型的词嵌入层和分词器的词汇表大小以验证
+
             print(f"Model embedding size: {model.get_input_embeddings().weight.size(0)}")
             print(f"Tokenizer vocabulary size: {len(tokenizer)}")
             model = LoraCodeLlama(model).cuda()

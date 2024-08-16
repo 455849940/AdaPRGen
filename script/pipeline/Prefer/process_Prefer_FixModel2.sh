@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# 从命令行参数获取循环次数
 begin_iterations=1600
 end_iterations=1600
 PORT=61600
@@ -32,18 +31,15 @@ Exec_status=False
 statistic_status=False
 test_status=False
 
-# 获取 GPU 个数
 IFS=',' read -ra GPU_ARRAY <<< "$gpu_seq"
 gpu_count=${#GPU_ARRAY[@]}
 
 if [ "$train_status" = "true" ]; then
-    # 构建文件路径
     file_path="./output_dir/DpoWeight/$Version"
-    # 检查文件是否存在
     if [ -e "$file_path" ]; then
-        echo "文件 $file_path 存在"
+        echo "file $file_path exist"
     else
-        echo "目录 $file_path 不存在，创建目录"
+        echo "catalogue $file_path not exist, create it"
         mkdir -p "$file_path"
     fi
     #echo ">>>start Train"
@@ -67,13 +63,13 @@ fi
 
 
 if [ "$dev_second_status" = "true" ]; then
-    # 构建文件路径
+    
     file_path="./predict_dir/DpoWeight/$Version-GEN"
-    # 检查文件是否存在
+    
     if [ -e "$file_path" ]; then
-        echo "文件 $file_path 存在"
+        echo "file $file_path exist"
     else
-        echo "目录 $file_path 不存在，创建目录"
+        echo "catalogue $file_path not exist, create it"
         mkdir -p "$file_path"
     fi
 
@@ -83,38 +79,32 @@ if [ "$dev_second_status" = "true" ]; then
 fi
 
 if [ "$Exec_status" = "true" ]; then
-    # 构建文件路径
     file_path="./predict_evalResult_dir/$Version-GEN"
-    # 检查文件是否存在
+    
     if [ -e "$file_path" ]; then
-        echo "文件 $file_path 存在"
+        echo "file $file_path exist"
     else
-        echo "目录 $file_path 不存在，创建目录"
+        echo "catalogue $file_path not exist, create it"
         mkdir -p "$file_path"
     fi
     echo ">>>start Execution" 
     bash ./script/pipeline/part/recyle_Execution2Perfer.sh "$end_iterations" "$PATTERN" "$begin_iterations" "$SAVE_STEPS" "$Version-GEN"
 fi
-#需要通过genbycpr执行得到结果
 
 if [ "$statistic_status" = "true" ]; then
-    #初始化最大 rate 和对应的 i
     max_rate=0.0
     best_iteration=0
     echo ">>>start choose best dev rate value"
-    # 遍历迭代范围，执行脚本并捕获输出
+
     for ((i=begin_iterations; i<=end_iterations; i+=SAVE_STEPS)); do
         output=$(bash ./script/pipeline/part/Statistical_Execution_Results.sh "$Version-GEN" "$PATTERN" "$i")
         echo "$output"
-        #从输出中提取 rate 值
         avg_improve_rate=$(echo "$output" | grep 'avg_improve_rate = ' | awk '{print $3}')
-        # 检查 rate 是否提取成功
         if [ -z "$avg_improve_rate" ]; then
             echo "Failed to extract rate for iteration $i"
             continue
         fi
-        #echo eavg_improve_rate
-        # 比较并更新最大 rate 和对应的 i
+
         if (( $(echo "$avg_improve_rate > $max_rate" | bc -l) )); then
         max_rate=$avg_improve_rate
         best_iteration=$i

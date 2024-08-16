@@ -23,9 +23,6 @@ from tqdm import tqdm
 from codeTool.utlis.utils import save_data_to_json
 import re
 from torch.cuda.amp import autocast, GradScaler
-#import safetensors
-# 尝试增加头部大小限制
-#safetensors_rust.set_header_size_limit(1024 * 1024)  # 设置头部大小限制为 1MB
 
 B_INST, E_INST = "[INST]", "[/INST]"
 B_SYS, E_SYS = "<<SYS>>\n", "\n<</SYS>>\n\n"
@@ -35,17 +32,17 @@ def load_peft_model(model, peft_model):
     return peft_model
 
 def extract_triple_quotes(text):
-    # 匹配被三引号 ''' 包裹的内容
+    # Matches the content wrapped in triple quotes '''.
     pattern = r"```(.*?)```"
     
-    # 使用 findall 寻找所有匹配的内容
+    # Use findall to find all matching content
     matches = re.findall(pattern, text, flags=re.DOTALL)
     
     if matches:
-        # 如果找到匹配的内容，则返回所有被三引号包裹的部分 0为index
+        # If matching content is found, return all parts wrapped in triple quotes ''' as a list where 0 is the index.
         return matches[0]
     else:
-        # 如果没有找到匹配的内容，返回原始文本
+        # If no matching content is found, return the original text.
         return text
     
 def Get_code_content(text):
@@ -58,7 +55,7 @@ def eval(args, model, tokenizer, dataloader):
     eval_list = []
 
  
-    # 生成文本
+    # Generate text
     for step, batch in enumerate(tqdm(dataloader,colour="green", desc="predict Epoch", dynamic_ncols=True)): 
         input_ids=batch['input_ids'].cuda()
         user_id_batch=batch['user_id_batch']
@@ -73,7 +70,7 @@ def eval(args, model, tokenizer, dataloader):
             torch.cuda.empty_cache()
 
         for i in range(0, args.per_device_eval_batch_size):
-            # 解码生成的文本
+            # Decode the generated text
             generated_text = tokenizer.decode(output_sequences[i], skip_special_tokens=True)
             user_id = user_id_batch[i]
             problem_id = problem_id_batch[i]
@@ -115,7 +112,7 @@ def main(**kwargs):
     
     model.resize_token_embeddings(len(tokenizer))
     model = model.cuda()
-    # 打印模型的词嵌入层和分词器的词汇表大小以验证
+    # Print the size of the model's word embedding layer and tokenizer's vocabulary for verification
     print(f"Model embedding size: {model.get_input_embeddings().weight.size(0)}")
     print(f"Tokenizer vocabulary size: {len(tokenizer)}")
 

@@ -8,9 +8,7 @@ def trace_lines(frame, event, arg):
     line_no = frame.f_lineno
     filename = co.co_filename
 
-    # 保证只对目标脚本进行追踪
     if "target_script.py" in filename:
-        # 检查是否已经缓存了文件的内容
         if not hasattr(trace_lines, "file_lines") or trace_lines.current_file != filename:
             try:
                 with open(filename, "r") as file:
@@ -20,7 +18,6 @@ def trace_lines(frame, event, arg):
                 trace_lines.file_lines = []
                 print(f"Error reading file {filename}: {e}")
 
-        # 获取并打印当前执行的代码行
         current_line = trace_lines.file_lines[line_no - 1].strip() if line_no <= len(trace_lines.file_lines) else "<line not found>"
         print(f"{func_name} Line {line_no}: {current_line} | Locals: {frame.f_locals}")
 

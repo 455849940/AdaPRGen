@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# 从命令行参数获取循环次数
 CHECKPOINT=14000
 PORT=61500
 DEVPORT=$((PORT + 10))
@@ -14,19 +13,17 @@ resume=False
 eval_batch_size=2
 debug_mode=True
 
-# 获取 GPU 个数
 IFS=',' read -ra GPU_ARRAY <<< "$gpu_seq2eval"
 gpu_count=${#GPU_ARRAY[@]}
 
 echo "$gpu_count"
 
-# 构建文件路径
 file_path="./predict_dir/loraWeight/$SAVE_FILE"
-# 检查文件是否存在
+
 if [ -e "$file_path" ]; then
-    echo "文件 $file_path 存在"
+    echo "file $file_path exist"
 else
-    echo "目录 $file_path 不存在，创建目录"
+    echo "catalogue $file_path not exist, create it"
     mkdir -p "$file_path"
 fi
 

@@ -1,7 +1,6 @@
 import sys
 import os
 
-# 获取当前文件所在目录的父目录，并将其添加到sys.path
 # current_dir = os.path.dirname(os.path.abspath(__file__))
 # parent_dir = os.path.abspath(os.path.join(current_dir, '..'))
 # sys.path.insert(0, parent_dir)
@@ -15,14 +14,14 @@ if __name__ == '__main__':
     EXECUTION_ALL = True
     CHECK_TEST1 = False
     
-    FileDictory = "/home/develop/dzl/CodeFixProject/CodeDatasets/merged_test_cases/p00010"
+    FileDictory = "/home/develop/xxx/CodeFixProject/CodeDatasets/merged_test_cases/p00010"
     
     checker = Checker()
     if CHECK_TEST1 == True:
         str1 = "  Hello, world! \nThis is a test.   \n  "
         str2 = "Hello, world!\nThis is a test.\n"
         result = checker.Check_consistency(str1, str2)
-        print(result)  # 输出: True
+        print(result)
 
     w = Worker()
     Compile_File_name = "s001.py"
@@ -44,11 +43,9 @@ print(ans)
         print(Psubmit)
         print(type(Psubmit))
     if EXECUTION_ALL == True:
-        # 初始化共享对象
         FileHandlerSingleton.initialize()
 
-        # 确认工作目录和路径
-        test_directory = '/home/develop/dzl/CodeFixProject/CodeDatasets/merged_test_cases/p03479'
+        test_directory = '/home/develop/xxx/CodeFixProject/CodeDatasets/merged_test_cases/p03479'
         if not os.path.exists(test_directory):
             raise FileNotFoundError(f"Directory {test_directory} does not exist")
         

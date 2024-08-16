@@ -205,7 +205,6 @@ def get_stack_exchange_paired2(
     """
     df = pd.DataFrame(data_list)
 
-    # 将 DataFrame 转换为 Dataset
     dataset = Dataset.from_pandas(df)
     original_columns = dataset.column_names
 
@@ -232,7 +231,6 @@ if __name__ == "__main__":
 
     set_seed(script_args.seed)
 
-    # 1. load a pretrained model
     torch_dtype = torch.float
     if script_args.model_dtype == "float16":
         torch_dtype = torch.float16
